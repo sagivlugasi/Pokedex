@@ -2,9 +2,14 @@ package edu.harvard.cs50.pokedex;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,8 +27,11 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView numberTextView;
     private TextView type1TextView;
     private TextView type2TextView;
+    Button button;
     private String url;
     private RequestQueue requestQueue;
+    boolean is_catched = false;
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +41,14 @@ public class PokemonActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         url = getIntent().getStringExtra("url");
         nameTextView = findViewById(R.id.pokemon_name);
+        button = findViewById(R.id.button);
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
 
+
         load();
+
     }
 
     public void load() {
@@ -50,6 +61,27 @@ public class PokemonActivity extends AppCompatActivity {
                 try {
                     nameTextView.setText(response.getString("name"));
                     numberTextView.setText(String.format("#%03d", response.getInt("id")));
+
+                    sharedPref = getSharedPreferences(nameTextView.getText().toString(),Context.MODE_PRIVATE);
+                    if(sharedPref.contains(nameTextView.getText().toString())) {
+                        is_catched = sharedPref.getBoolean(nameTextView.getText().toString(), false);
+                        if (is_catched == true)
+                        {
+                            button.setText("Release");
+                        }
+                        else
+                        {
+                            button.setText("Catch");
+
+                        }
+                    }
+                    else
+                    {
+                        is_catched = false;
+                        button.setText("Catch");
+
+                    }
+
 
                     JSONArray typeEntries = response.getJSONArray("types");
                     for (int i = 0; i < typeEntries.length(); i++) {
@@ -76,5 +108,43 @@ public class PokemonActivity extends AppCompatActivity {
         });
 
         requestQueue.add(request);
+    }
+
+    public void toggleCatch(View view) {
+        if ((is_catched))
+        {
+            button.setText("Catch");
+            is_catched = false;
+
+        }
+        else
+        {
+            button.setText("Release");
+            is_catched = true;
+
+        }
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(nameTextView.getText().toString(), is_catched).commit();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if ((is_catched))
+                {
+                    button.setText("Catch");
+                    is_catched = false;
+
+                }
+                else
+                {
+                    button.setText("Release");
+                    is_catched = true;
+
+                }
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean(nameTextView.getText().toString(), is_catched).commit();
+            }
+        });
+        // gotta catch 'em all!
     }
 }

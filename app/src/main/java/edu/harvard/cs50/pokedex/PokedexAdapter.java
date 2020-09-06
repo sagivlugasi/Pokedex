@@ -10,6 +10,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,6 +57,8 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
     }
 
     private List<Pokemon> pokemon = new ArrayList<>();
+    public List<Pokemon> tmp  = new ArrayList<>();
+
     private RequestQueue requestQueue;
 
     PokedexAdapter(Context context) {
@@ -90,8 +93,11 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
                 Log.e("cs50", "Pokemon list error", error);
             }
         });
-
         requestQueue.add(request);
+        tmp.clear();
+        tmp.addAll(pokemon);
+
+
     }
 
     @NonNull
@@ -105,7 +111,7 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
 
     @Override
     public void onBindViewHolder(@NonNull PokedexViewHolder holder, int position) {
-        // set the first values of the row
+        // set the values of the row
         Pokemon current = pokemon.get(position);
         holder.textView.setText(current.getName());
         holder.containerView.setTag(current);
@@ -120,30 +126,37 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
     private class PokemonFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            //constraintn is the input
-            // implement your search here!
             List<Pokemon> filteredPokemon = new ArrayList<>();
-
-            for(int i = 0;i < pokemon.size();i++) {
-                if (pokemon.get(i).getName().startsWith(constraint.toString())) {
-                    filteredPokemon.add(pokemon.get(i));
+            if(pokemon == null)
+            {
+                pokemon.addAll(tmp);
+            }
+            if (constraint.toString().isEmpty() || constraint.length() == 0) {
+                filteredPokemon.clear();
+                filteredPokemon.addAll(tmp);
+            }
+            else {
+                for (int i = 0; i < pokemon.size(); i++) {
+                    if (pokemon.get(i).getName().startsWith(constraint.toString())) {
+                        filteredPokemon.add(pokemon.get(i));
+                    }
                 }
-
             }
             FilterResults results = new FilterResults();
             results.values = filteredPokemon; // you need to create this variable!
             results.count = filteredPokemon.size();
             return results;
-        }
+            }
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<Pokemon> filtered = (List<Pokemon>) results.values;
-            notifyDataSetChanged();
 
-
-            notifyDataSetChanged();
+                pokemon.clear();
+                pokemon.addAll((List) results.values);
+                notifyDataSetChanged();
         }
+
+
     }
 
     @Override
