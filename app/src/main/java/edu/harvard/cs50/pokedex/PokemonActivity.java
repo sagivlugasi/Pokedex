@@ -178,9 +178,8 @@ public class PokemonActivity extends AppCompatActivity {
 
                     JSONObject sprites = response.getJSONObject("sprites");
                     String image_url = sprites.getString("front_default");
-                    Toast.makeText(PokemonActivity.this,image_url,Toast.LENGTH_SHORT).show();
-
-                      //  JSONObject other = sprites.getJSONObject(8);
+                    new DownloadSpriteTask().execute(image_url);
+                    //  JSONObject other = sprites.getJSONObject(8);
                        // int slot = typeEntry.getInt("slot");
                        // String type = typeEntry.getJSONObject("type").getString("name");
 
@@ -220,6 +219,7 @@ public class PokemonActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             // load the bitmap into the ImageView!
+            imageView.setImageBitmap(bitmap);
         }
     }
 }
