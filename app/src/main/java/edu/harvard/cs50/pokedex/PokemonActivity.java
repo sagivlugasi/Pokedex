@@ -36,6 +36,7 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type1TextView;
     private TextView type2TextView;
     private ImageView imageView;
+    private  TextView Description;
     Button button;
     private String url;
     private RequestQueue requestQueue;
@@ -55,12 +56,13 @@ public class PokemonActivity extends AppCompatActivity {
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
         imageView = findViewById(R.id.imageView);
+        Description = findViewById(R.id.Description);
 
 
 
         load();
         loadimage();
-
+        loaddescription();
     }
 
     public void load() {
@@ -179,15 +181,6 @@ public class PokemonActivity extends AppCompatActivity {
                     JSONObject sprites = response.getJSONObject("sprites");
                     String image_url = sprites.getString("front_default");
                     new DownloadSpriteTask().execute(image_url);
-                    //  JSONObject other = sprites.getJSONObject(8);
-                       // int slot = typeEntry.getInt("slot");
-                       // String type = typeEntry.getJSONObject("type").getString("name");
-
-
-
-                    //JSONArray results = response.getJSONArray("sprites");
-                    // JSONObject result = results.getJSONObject(0);
-                    // String name = result.getJSONObject()getString("back_default");
 
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
@@ -202,6 +195,37 @@ public class PokemonActivity extends AppCompatActivity {
 
         requestQueue.add(request);
     }
+    public void loaddescription() {
+        String desc_url = "https://pokeapi.co/api/v2/";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, desc_url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+                    JSONObject species = response.getJSONObject("species");
+                    Toast.makeText(PokemonActivity.this, "hey", Toast.LENGTH_SHORT).show();
+
+                    // species = species.getJSONObject("")
+                    //Toast.makeText(PokemonActivity.this,"hey hey",Toast.LENGTH_SHORT).show();
+
+
+                }
+
+
+                catch (JSONException e) {
+                    Log.e("cs50", "Pokemon json error", e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("cs50", "Pokemon details error", error);
+            }
+        });
+
+        requestQueue.add(request);
+    }
+
 
     private class DownloadSpriteTask extends AsyncTask<String, Void, Bitmap> {
         @Override
