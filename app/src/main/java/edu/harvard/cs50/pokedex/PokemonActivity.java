@@ -41,7 +41,9 @@ public class PokemonActivity extends AppCompatActivity {
     private String url;
     private RequestQueue requestQueue;
     boolean is_catched = false;
-    SharedPreferences sharedPref;
+    public SharedPreferences sharedPref;
+    public String id = "0";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +60,16 @@ public class PokemonActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         Description = findViewById(R.id.Description);
 
+       // Toast.makeText(PokemonActivity.this, sharedPref.getString("id","0"), Toast.LENGTH_SHORT).show();
+
+
 
 
         load();
         loadimage();
         loaddescription();
+
+
     }
 
     public void load() {
@@ -113,9 +120,7 @@ public class PokemonActivity extends AppCompatActivity {
                         }
                     }
 
-                    //JSONArray results = response.getJSONArray("sprites");
-                   // JSONObject result = results.getJSONObject(0);
-                   // String name = result.getJSONObject()getString("back_default");
+
 
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
@@ -132,6 +137,7 @@ public class PokemonActivity extends AppCompatActivity {
     }
 
     public void toggleCatch(View view) {
+
         if ((is_catched))
         {
             button.setText("Catch");
@@ -171,11 +177,11 @@ public class PokemonActivity extends AppCompatActivity {
 
 
     public void loadimage() {
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+
                     imageView.setImageResource(R.drawable.ic_launcher_background);
 
                     JSONObject sprites = response.getJSONObject("sprites");
@@ -196,18 +202,20 @@ public class PokemonActivity extends AppCompatActivity {
         requestQueue.add(request);
     }
     public void loaddescription() {
-        String desc_url = "https://pokeapi.co/api/v2/";
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, desc_url, null, new Response.Listener<JSONObject>() {
+
+        String info_url = "https://pokeapi.co/api/v2/pokemon-species/"+url.subSequence(33,url.length()-1).toString().replace("/","")+"/" ;
+        Toast.makeText(PokemonActivity.this, url , Toast.LENGTH_SHORT).show();
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, info_url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
                 try {
-                    JSONObject species = response.getJSONObject("species");
-                    Toast.makeText(PokemonActivity.this, "hey", Toast.LENGTH_SHORT).show();
 
-                    // species = species.getJSONObject("")
-                    //Toast.makeText(PokemonActivity.this,"hey hey",Toast.LENGTH_SHORT).show();
-
+                    JSONArray results = response.getJSONArray("flavor_text_entries");
+                    JSONObject result = results.getJSONObject(1);
+                    String name = result.getString("flavor_text");
+                    Description.setText(name);
 
                 }
 
@@ -242,6 +250,7 @@ public class PokemonActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+
             // load the bitmap into the ImageView!
             imageView.setImageBitmap(bitmap);
         }

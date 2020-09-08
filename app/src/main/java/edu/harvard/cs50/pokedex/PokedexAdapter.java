@@ -50,6 +50,7 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
                     Intent intent = new Intent(v.getContext(), PokemonActivity.class);
                     intent.putExtra("url", current.getUrl());
 
+
                     v.getContext().startActivity(intent);
                 }
             });
